@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spice Route – Restaurant Management Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --saffron:#E8922A; --turmeric:#D4781A; --cardamom:#2C3E2D; --cream:#FDF6EC;
+  --ivory:#FAF0DC; --bark:#5C3D1E; --ash:#8B7355; --smoke:#F5EBD8; --white:#FFFFFF;
+  --error:#C0392B; --success:#27AE60; --text-dark:#1A1005; --text-mid:#4A3728;
+  --text-light:#8B7355; --border:#E8D5B5; --radius:12px; --radius-sm:8px;
+  --shadow-sm:0 2px 8px rgba(92,61,30,.10); --shadow-md:0 8px 24px rgba(92,61,30,.14);
+  --transition:.22s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-dark);line-height:1.6;min-height:100vh;}
+
+/* NAV */
+.nav{background:var(--cardamom);padding:0 2rem;display:flex;align-items:center;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.25);}
+.nav-brand{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:var(--saffron);text-decoration:none;letter-spacing:.04em;flex-shrink:0;}
+.nav-brand span{color:var(--cream);font-weight:400;font-style:italic;}
+.nav-links{display:flex;gap:.25rem;margin-left:auto;list-style:none;}
+.nav-links a{color:rgba(253,246,236,.75);text-decoration:none;font-size:.8rem;font-weight:500;padding:.45rem .8rem;border-radius:6px;transition:var(--transition);text-transform:uppercase;letter-spacing:.04em;cursor:pointer;}
+.nav-links a:hover,.nav-links a.active{background:rgba(232,146,42,.18);color:var(--saffron);}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--cardamom) 0%,#3a5c3c 100%);color:var(--cream);padding:4rem 2rem;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,4rem);font-weight:700;color:var(--saffron);position:relative;}
+.hero-sub{font-size:.95rem;color:rgba(253,246,236,.8);margin-top:.5rem;position:relative;}
+
+/* LAYOUT */
+.page{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 4rem;}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.75rem;box-shadow:var(--shadow-sm);}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--bark);margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:2px solid var(--smoke);}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:var(--bark);}
+.page-sub{color:var(--text-light);margin-top:.3rem;font-size:.875rem;}
+.ph{margin-bottom:1.75rem;}
+
+/* SCREEN MANAGER */
+.screen{display:none;}.screen.active{display:block;}
+
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;}
+.form-group{display:flex;flex-direction:column;gap:.35rem;}
+.form-group label{font-size:.75rem;font-weight:600;color:var(--text-mid);text-transform:uppercase;letter-spacing:.06em;}
+.form-control{padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:.875rem;color:var(--text-dark);background:var(--cream);transition:var(--transition);outline:none;}
+.form-control:focus{border-color:var(--saffron);background:var(--white);box-shadow:0 0 0 3px rgba(232,146,42,.12);}
+select.form-control{cursor:pointer;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.2rem;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:var(--transition);}
+.btn-primary{background:var(--saffron);color:var(--white);}
+.btn-primary:hover{background:var(--turmeric);}
+.btn-dark{background:var(--cardamom);color:var(--white);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text-mid);}
+.btn-outline:hover{border-color:var(--saffron);color:var(--saffron);}
+.btn-danger{background:var(--error);color:var(--white);}
+.btn-success{background:var(--success);color:var(--white);}
+.btn-sm{padding:.35rem .75rem;font-size:.78rem;}
+.w-full{width:100%;}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;}
+.data-table{width:100%;border-collapse:collapse;font-size:.875rem;}
+.data-table th{background:var(--smoke);color:var(--text-mid);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;padding:.85rem 1rem;text-align:left;border-bottom:2px solid var(--border);}
+.data-table td{padding:.8rem 1rem;border-bottom:1px solid var(--border);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:var(--smoke);}
+
+/* BADGES */
+.badge{display:inline-block;padding:.2rem .65rem;border-radius:20px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+.b-available,.b-completed,.b-veg{background:#D5F5E3;color:#1E8449;}
+.b-occupied,.b-beverage{background:#FDEBD0;color:#A04000;}
+.b-reserved,.b-active{background:#EBF5FB;color:#1A5276;}
+.b-cancelled,.b-nonveg{background:#FADBD8;color:#922B21;}
+
+/* ALERTS */
+.alert{padding:.85rem 1.2rem;border-radius:var(--radius-sm);font-size:.875rem;margin-bottom:1.25rem;border-left:4px solid;display:flex;align-items:center;gap:.65rem;}
+.alert-success{background:#D5F5E3;border-color:var(--success);color:#1E8449;}
+.alert-error{background:#FADBD8;border-color:var(--error);color:#922B21;}
+
+/* GRIDS */
+.two-col{display:grid;grid-template-columns:360px 1fr;gap:1.5rem;align-items:start;}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1.25rem;margin-bottom:1.5rem;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center;box-shadow:var(--shadow-sm);}
+.stat-icon{font-size:2rem;margin-bottom:.4rem;}
+.stat-value{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:var(--saffron);line-height:1;}
+.stat-label{font-size:.75rem;color:var(--text-light);margin-top:.25rem;text-transform:uppercase;letter-spacing:.05em;}
+
+/* MODULE GRID */
+.mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1.25rem;margin-top:2rem;}
+.mod-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.75rem 1.5rem;text-align:center;cursor:pointer;transition:var(--transition);}
+.mod-card:hover{border-color:var(--saffron);box-shadow:var(--shadow-md);transform:translateY(-4px);}
+.mod-icon{font-size:2.4rem;display:block;margin-bottom:.75rem;}
+.mod-label{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--bark);}
+.mod-desc{font-size:.75rem;color:var(--text-light);margin-top:.3rem;}
+
+/* TABLE FLOOR */
+.floor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:1rem;}
+.t-card{border:2px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;cursor:pointer;transition:var(--transition);background:var(--white);}
+.t-card.available{border-color:#27AE60;}
+.t-card.occupied{border-color:var(--saffron);}
+.t-card.reserved{border-color:#2980B9;}
+.t-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);}
+.t-num{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--bark);}
+.t-cap{font-size:.72rem;color:var(--text-light);margin-bottom:.5rem;}
+
+/* MENU GRID */
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;}
+.mi-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;transition:var(--transition);}
+.mi-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
+.mi-name{font-weight:600;font-size:.9rem;}
+.mi-price{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:700;color:var(--saffron);white-space:nowrap;}
+
+/* RECEIPT */
+.receipt{background:var(--white);border:1px dashed var(--border);border-radius:var(--radius);padding:2rem;max-width:460px;}
+.rh{text-align:center;border-bottom:2px dashed var(--border);padding-bottom:1.25rem;margin-bottom:1.25rem;}
+.rname{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:700;color:var(--bark);}
+.rrow{display:flex;justify-content:space-between;padding:.4rem 0;font-size:.875rem;border-bottom:1px dotted var(--border);}
+.rtotal{display:flex;justify-content:space-between;padding:.75rem 0 0;font-weight:700;font-size:1.1rem;border-top:2px solid var(--bark);margin-top:.5rem;color:var(--bark);}
+
+/* TABS */
+.tab-bar{display:flex;gap:.5rem;border-bottom:2px solid var(--border);margin-bottom:1.5rem;}
+.tab-btn{padding:.6rem 1.25rem;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:600;color:var(--text-light);cursor:pointer;position:relative;bottom:-2px;border-bottom:2px solid transparent;transition:var(--transition);}
+.tab-btn.active{color:var(--saffron);border-bottom-color:var(--saffron);}
+.tab-btn:hover{color:var(--saffron);}
+.tab-pane{display:none;}.tab-pane.active{display:block;}
+
+/* SYSTEM INFO */
+.sys-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;}
+.sys-col-title{font-weight:600;color:var(--bark);margin-bottom:.5rem;}
+.sys-ul{list-style:none;font-size:.85rem;color:var(--text-mid);line-height:2.1;}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+
+.flex{display:flex;}.gap-1{gap:.5rem;}.gap-2{gap:1rem;}.items-center{align-items:center;}.justify-between{justify-content:space-between;}
+.mt-1{margin-top:.5rem;}.mt-2{margin-top:1rem;}.mt-3{margin-top:1.5rem;}
+.text-muted{color:var(--text-light);}.text-sm{font-size:.8rem;}.text-center{text-align:center;}.font-bold{font-weight:700;}
+
+@media(max-width:900px){.two-col{grid-template-columns:1fr;}.sys-grid{grid-template-columns:1fr;}}
+@media(max-width:640px){.nav-links{display:none;}.page{padding:1.5rem 1rem 3rem;}}
+
+/* ── SQL PANEL ─────────────────────────────────────────── */
+.sql-layout{display:grid;grid-template-columns:260px 1fr;gap:1.25rem;align-items:start;}
+.sql-editor-wrap{position:relative;}
+.sql-editor{width:100%;min-height:130px;font-family:'Courier New',monospace;font-size:.82rem;line-height:1.65;padding:1rem;background:#1E1E2E;color:#CDD6F4;border:2px solid #313244;border-radius:var(--radius-sm);resize:vertical;outline:none;tab-size:2;transition:border-color .2s;}
+.sql-editor:focus{border-color:var(--saffron);}
+.sql-run-bar{display:flex;align-items:center;gap:.75rem;margin-top:.75rem;flex-wrap:wrap;}
+.sql-status{font-size:.78rem;color:var(--text-light);font-family:'Courier New',monospace;}
+.sql-status.ok{color:var(--success);} .sql-status.err{color:var(--error);}
+.sql-result-wrap{overflow-x:auto;margin-top:1.25rem;border-radius:var(--radius-sm);border:1px solid var(--border);}
+.sql-result-table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:400px;}
+.sql-result-table th{background:#1E1E2E;color:#CBA6F7;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;padding:.7rem 1rem;text-align:left;font-family:'Courier New',monospace;border-bottom:2px solid #313244;}
+.sql-result-table td{padding:.65rem 1rem;border-bottom:1px solid var(--border);font-family:'Courier New',monospace;font-size:.8rem;color:var(--text-dark);}
+.sql-result-table tr:last-child td{border-bottom:none;}
+.sql-result-table tr:nth-child(even) td{background:var(--smoke);}
+.sql-result-table tr:hover td{background:var(--ivory);}
+.sql-null{color:#888;font-style:italic;}
+.sql-num{color:#89DCEB;font-weight:600;}
+.sql-snippet{display:block;background:#1E1E2E;color:#A6E3A1;font-family:'Courier New',monospace;font-size:.72rem;padding:.6rem .9rem;border-radius:6px;margin-bottom:.4rem;cursor:pointer;border:1px solid transparent;transition:border-color .18s,background .18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sql-snippet:hover{border-color:var(--saffron);background:#2A2A3E;}
+.sql-snippet small{display:block;color:#6C7086;font-size:.65rem;margin-top:.15rem;white-space:normal;}
+.sql-empty{text-align:center;padding:2.5rem;color:var(--text-light);font-size:.875rem;}
+.sql-rows-badge{display:inline-block;background:var(--saffron);color:#fff;font-size:.68rem;font-weight:700;padding:.15rem .55rem;border-radius:20px;margin-left:.5rem;}
+.schema-pill{display:inline-block;background:var(--smoke);border:1px solid var(--border);border-radius:6px;font-size:.72rem;font-family:'Courier New',monospace;color:var(--bark);padding:.2rem .6rem;margin:.15rem .1rem;}
+.sql-cat{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-light);margin:.9rem 0 .35rem;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <span class="nav-brand">🌶️ Spice Route <span>Portal</span></span>
+  <ul class="nav-links">
+    <li><a onclick="show('home')" class="active" id="nav-home">Home</a></li>
+    <li><a onclick="show('customers')" id="nav-customers">Customers</a></li>
+    <li><a onclick="show('profiles')" id="nav-profiles">📁 Profiles</a></li>
+    <li><a onclick="show('tables')" id="nav-tables">Tables</a></li>
+    <li><a onclick="show('menu')" id="nav-menu">Menu</a></li>
+    <li><a onclick="show('orders')" id="nav-orders">Orders</a></li>
+    <li><a onclick="show('billing')" id="nav-billing">Billing</a></li>
+    <li><a onclick="show('reservations')" id="nav-reservations">Reservations</a></li>
+    <li><a onclick="show('sqlpanel')" id="nav-sqlpanel" style="background:rgba(232,146,42,.15);border:1px solid rgba(232,146,42,.35)">🗄️ SQL</a></li>
+  </ul>
+</nav>
+
+<!-- ════════════ HOME ════════════ -->
+<div class="screen active" id="screen-home">
+  <div class="hero">
+    <h1 class="hero-title">🌶️ Spice Route</h1>
+    <p class="hero-sub">Complete Restaurant Management Portal — customers, orders, billing & reservations unified.</p>
+  </div>
+  <div class="page">
+    <div class="mod-grid">
+      <div class="mod-card" onclick="show('customers')"><span class="mod-icon">👥</span><div class="mod-label">Customers</div><div class="mod-desc">Register & manage customer profiles</div></div>
+      <div class="mod-card" onclick="show('tables')"><span class="mod-icon">🪑</span><div class="mod-label">Tables</div><div class="mod-desc">Live table status dashboard</div></div>
+      <div class="mod-card" onclick="show('menu')"><span class="mod-icon">📋</span><div class="mod-label">Menu</div><div class="mod-desc">Food items, categories & pricing</div></div>
+      <div class="mod-card" onclick="show('orders')"><span class="mod-icon">🧾</span><div class="mod-label">Orders</div><div class="mod-desc">Create & manage active orders</div></div>
+      <div class="mod-card" onclick="show('billing')"><span class="mod-icon">💰</span><div class="mod-label">Billing</div><div class="mod-desc">Generate bills with 5% GST</div></div>
+      <div class="mod-card" onclick="show('reservations')"><span class="mod-icon">📅</span><div class="mod-label">Reservations</div><div class="mod-desc">Advance table booking</div></div>
+      <div class="mod-card" onclick="show('profiles')"><span class="mod-icon">📁</span><div class="mod-label">Customer Profiles</div><div class="mod-desc">Full visit history & billing records per customer</div></div>
+    </div>
+    <div class="card mt-3" style="margin-top:2rem">
+      <div class="card-title">⚙️ System Architecture Overview</div>
+      <div class="sys-grid">
+        <div>
+          <div class="sys-col-title">🔒 ACID Properties</div>
+          <ul class="sys-ul">
+            <li>🔒 <strong>Atomicity</strong> — Order + Billing in one TX</li>
+            <li>🔄 <strong>Consistency</strong> — Triggers sync all states</li>
+            <li>🔐 <strong>Isolation</strong> — FOR UPDATE row-locks</li>
+            <li>💾 <strong>Durability</strong> — All commits persisted</li>
+          </ul>
+        </div>
+        <div>
+          <div class="sys-col-title">⚙️ Stored Procedures</div>
+          <ul class="sys-ul">
+            <li>✔ AddCustomer()</li>
+            <li>✔ CreateOrder()</li>
+            <li>✔ AddOrderItem()</li>
+            <li>✔ GenerateBill()</li>
+            <li>✔ ReserveTable()</li>
+            <li>✔ UpdateTableStatus()</li>
+            <li>✔ CompleteOrder()</li>
+          </ul>
+        </div>
+        <div>
+          <div class="sys-col-title">🔁 Triggers</div>
+          <ul class="sys-ul">
+            <li>AfterOrderInsert → Table Occupied</li>
+            <li>AfterOrderUpdate → Table Available</li>
+            <li>AfterOrderDetailInsert → Bill ↑</li>
+            <li>AfterOrderDetailUpdate → Bill ↑</li>
+            <li>AfterOrderDetailDelete → Bill ↓</li>
+            <li>AfterReservationInsert → Reserved</li>
+            <li>AfterReservationUpdate → Available</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ CUSTOMERS ════════════ -->
+<div class="screen" id="screen-customers">
+  <div class="page">
+    <div class="ph"><h1 class="page-title">👥 Customer Management</h1><p class="page-sub">Register customers — available immediately for orders & reservations (via AddCustomer stored procedure)</p></div>
+    <div id="cust-alert"></div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Register New Customer</div>
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="form-group"><label>Full Name *</label><input id="c-name" type="text" class="form-control" placeholder="e.g. Priya Sharma"></div>
+          <div class="form-group"><label>Phone Number *</label><input id="c-phone" type="tel" class="form-control" placeholder="e.g. 9876543210" maxlength="10" pattern="[6-9][0-9]{9}" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"></div>
+          <div class="form-group"><label>Email Address <span style="color:var(--text-light);font-weight:400;text-transform:none">(optional)</span></label><input id="c-email" type="email" class="form-control" placeholder="e.g. priya@email.com"></div>
+        </div>
+        <button class="btn btn-primary w-full" style="margin-top:1.25rem" onclick="addCustomer()">＋ Register Customer</button>
+      </div>
+      <div class="card">
+        <div class="card-title">All Customers <span style="font-size:.8rem;font-weight:400;color:var(--text-light)" id="cust-count"></span></div>
+        <div class="tbl-wrap">
+          <table class="data-table">
+            <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th>Registered</th></tr></thead>
+            <tbody id="cust-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ TABLES ════════════ -->
+<div class="screen" id="screen-tables">
+  <div class="page">
+    <div class="ph"><h1 class="page-title">🪑 Table Management</h1><p class="page-sub">Real-time table status — auto-updated by triggers on order & reservation events</p></div>
+    <div id="tbl-alert"></div>
+    <div class="stat-grid" id="tbl-stats"></div>
+    <div class="card">
+      <div class="card-title">Floor Plan View</div>
+      <div class="floor-grid" id="floor-grid"></div>
+    </div>
+    <div class="card" style="margin-top:1.5rem">
+      <div class="card-title">Table Details</div>
+      <div class="tbl-wrap"><table class="data-table"><thead><tr><th>Table</th><th>Capacity</th><th>Status</th><th>Action</th></tr></thead><tbody id="tbl-tbody"></tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ MENU ════════════ -->
+<div class="screen" id="screen-menu">
+  <div class="page">
+    <div class="ph"><h1 class="page-title">📋 Menu Management</h1><p class="page-sub">Manage food items across Veg, Non-Veg and Beverage categories</p></div>
+    <div id="menu-alert"></div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Add Menu Item</div>
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="form-group"><label>Item Name *</label><input id="m-name" type="text" class="form-control" placeholder="e.g. Paneer Butter Masala"></div>
+          <div class="form-group"><label>Category *</label>
+            <select id="m-cat" class="form-control">
+              <option value="">— Select —</option>
+              <option value="Veg">🌿 Veg</option>
+              <option value="Non-Veg">🍗 Non-Veg</option>
+              <option value="Beverage">🥤 Beverage</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Price (₹) *</label><input id="m-price" type="number" class="form-control" placeholder="e.g. 280" min="1"></div>
+        </div>
+        <button class="btn btn-primary w-full" style="margin-top:1.25rem" onclick="addMenuItem()">＋ Add Item</button>
+      </div>
+      <div>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="filterMenu('All',this)">All</button>
+          <button class="tab-btn" onclick="filterMenu('Veg',this)">🌿 Veg</button>
+          <button class="tab-btn" onclick="filterMenu('Non-Veg',this)">🍗 Non-Veg</button>
+          <button class="tab-btn" onclick="filterMenu('Beverage',this)">🥤 Beverage</button>
+        </div>
+        <div class="menu-grid" id="menu-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ ORDERS ════════════ -->
+<div class="screen" id="screen-orders">
+  <div class="page">
+    <div class="ph"><h1 class="page-title">🧾 Order Management</h1><p class="page-sub">Create orders, add items — billing auto-updates via AfterOrderDetail triggers</p></div>
+    <div id="ord-alert"></div>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="oTab('create',this)">Create New Order</button>
+      <button class="tab-btn" onclick="oTab('addItem',this)">Add Items</button>
+      <button class="tab-btn" onclick="oTab('active',this)">Active Orders</button>
+    </div>
+
+    <div class="tab-pane active" id="ot-create">
+      <div class="card" style="max-width:460px">
+        <div class="card-title">Create New Order</div>
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="form-group"><label>Customer *</label><select id="o-cust" class="form-control"><option value="">— Select Customer —</option></select></div>
+          <div class="form-group"><label>Available Table *</label><select id="o-tbl" class="form-control"><option value="">— Select Table —</option></select></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:1.25rem" onclick="createOrder()">🍽️ Create Order</button>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="ot-addItem">
+      <div class="card" style="max-width:520px">
+        <div class="card-title">Add Item to Order</div>
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="form-group"><label>Active Order *</label><select id="o-ord" class="form-control"><option value="">— Select Order —</option></select></div>
+          <div class="form-group"><label>Menu Item *</label><select id="o-item" class="form-control"><option value="">— Select Item —</option></select></div>
+          <div class="form-group"><label>Quantity *</label><input id="o-qty" type="number" class="form-control" value="1" min="1" max="20"></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:1.25rem" onclick="addOrderItem()">➕ Add Item</button>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="ot-active">
+      <div class="card">
+        <div class="card-title">Active Orders</div>
+        <div class="tbl-wrap"><table class="data-table"><thead><tr><th>Order #</th><th>Customer</th><th>Table</th><th>Time</th><th>Items</th><th>Actions</th></tr></thead><tbody id="ord-tbody"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ BILLING ════════════ -->
+<div class="screen" id="screen-billing">
+  <div class="page">
+    <div class="ph"><h1 class="page-title">💰 Billing Dashboard</h1><p class="page-sub">Generate bills — 5% GST calculated via GenerateBill stored procedure. Auto-syncs with OrderDetails via triggers.</p></div>
+    <div id="bill-alert"></div>
+    <div class="two-col">
+      <div>
+        <div class="card">
+          <div class="card-title">Generate / View Bill</div>
+          <div class="form-group"><label>Order ID</label><input id="b-ordid" type="number" class="form-control" placeholder="Enter Order #" min="1"></div>
+          <div class="flex gap-1" style="margin-top:1rem">
+            <button class="btn btn-primary" onclick="generateBill()">🧮 Generate Bill</button>
+            <button class="btn btn-outline" onclick="viewBill()">👁 View Bill</button>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1.25rem">
+          <div class="card-title">All Bills</div>
+          <div class="tbl-wrap"><table class="data-table"><thead><tr><th>Bill #</th><th>Order #</th><th>Customer</th><th>Total</th><th>Date</th></tr></thead><tbody id="bill-tbody"></tbody></table></div>
+        </div>
+      </div>
+      <div id="receipt-area">
+        <div class="card" style="display:flex;align-items:center;justify-content:center;min-height:200px">
+          <div class="text-center text-muted"><div style="font-size:2rem">🧾</div><div>Enter an Order ID to view or generate a bill</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ RESERVATIONS ════════════ -->
+<div class="screen" id="screen-reservations">
+  <div class="page">
+    <div class="ph"><h1 class="page-title">📅 Reservation Management</h1><p class="page-sub">Advance booking — double-booking prevention via ReserveTable stored procedure (±2 hr conflict window)</p></div>
+    <div id="res-alert"></div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">New Reservation</div>
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="form-group"><label>Customer *</label><select id="r-cust" class="form-control"><option value="">— Select Customer —</option></select></div>
+          <div class="form-group"><label>Table *</label><select id="r-tbl" class="form-control"><option value="">— Select Table —</option></select></div>
+          <div class="form-group"><label>Date & Time *</label><input id="r-dt" type="datetime-local" class="form-control"></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:1.25rem" onclick="makeReservation()">📅 Book Reservation</button>
+        <div style="margin-top:1.25rem;padding:1rem;background:var(--smoke);border-radius:var(--radius-sm);font-size:.8rem;color:var(--text-mid)">
+          <strong>ℹ️ Rules:</strong>
+          <ul style="margin-top:.4rem;list-style:disc;padding-left:1.25rem;line-height:1.9">
+            <li>Occupied tables cannot be reserved</li>
+            <li>No two bookings within 2 hours on same table</li>
+            <li>Cancellation auto-frees the table</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">All Reservations</div>
+        <div class="tbl-wrap"><table class="data-table"><thead><tr><th>#</th><th>Customer</th><th>Table</th><th>Date & Time</th><th>Status</th><th>Action</th></tr></thead><tbody id="res-tbody"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ CUSTOMER PROFILES FOLDER ════════════ -->
+<div class="screen" id="screen-profiles">
+  <div class="page">
+    <div class="ph"><h1 class="page-title">📁 Customer Profile Folders</h1><p class="page-sub">Complete visit history — arrival time, orders placed, and billing records per customer</p></div>
+    <div id="profiles-search-bar" style="margin-bottom:1.5rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+      <input id="profile-search" type="text" class="form-control" placeholder="🔍 Search by name or phone..." style="max-width:320px" oninput="renderProfiles()">
+      <span id="profile-count" style="color:var(--text-light);font-size:.85rem"></span>
+    </div>
+    <div id="profiles-list"></div>
+  </div>
+</div>
+
+<script>
+// ─── PERSISTENT STORAGE HELPERS ───────────────────────────
+const STORAGE_KEY = 'spiceroute_v2';
+
+const DEFAULT_STATE = {
+  customers: [
+    {id:1, name:'Arjun Mehta',   phone:'9876543210', email:'arjun@email.com',   date:'2025-01-10', arrivals:['2025-04-26 12:30']},
+    {id:2, name:'Priya Sharma',  phone:'8765432109', email:'priya@email.com',   date:'2025-01-12', arrivals:['2025-04-26 13:10']},
+    {id:3, name:'Rahul Verma',   phone:'7654321098', email:'rahul@email.com',   date:'2025-01-14', arrivals:[]},
+    {id:4, name:'Sneha Iyer',    phone:'9543210987', email:'sneha@email.com',   date:'2025-01-15', arrivals:[]},
+  ],
+  tables: [
+    {id:1,cap:2,status:'Available'},{id:2,cap:2,status:'Occupied'},
+    {id:3,cap:4,status:'Available'},{id:4,cap:4,status:'Reserved'},
+    {id:5,cap:4,status:'Available'},{id:6,cap:6,status:'Occupied'},
+    {id:7,cap:6,status:'Available'},{id:8,cap:8,status:'Available'},
+    {id:9,cap:8,status:'Reserved'},{id:10,cap:10,status:'Available'},
+  ],
+  menu: [
+    {id:1,name:'Paneer Tikka',          cat:'Veg',     price:320},
+    {id:2,name:'Veg Spring Rolls',      cat:'Veg',     price:180},
+    {id:3,name:'Chicken Tikka',         cat:'Non-Veg', price:380},
+    {id:4,name:'Mutton Seekh Kebab',    cat:'Non-Veg', price:420},
+    {id:5,name:'Dal Makhani',           cat:'Veg',     price:260},
+    {id:6,name:'Palak Paneer',          cat:'Veg',     price:280},
+    {id:7,name:'Butter Chicken',        cat:'Non-Veg', price:360},
+    {id:8,name:'Mutton Rogan Josh',     cat:'Non-Veg', price:420},
+    {id:9,name:'Garlic Naan',           cat:'Veg',     price:60},
+    {id:10,name:'Chicken Biryani',      cat:'Non-Veg', price:340},
+    {id:11,name:'Mango Lassi',          cat:'Beverage',price:120},
+    {id:12,name:'Masala Chai',          cat:'Beverage',price:60},
+    {id:13,name:'Paneer Butter Masala', cat:'Veg',     price:300},
+    {id:14,name:'Chole Bhature',        cat:'Veg',     price:180},
+    {id:15,name:'Aloo Paratha',         cat:'Veg',     price:120},
+    {id:16,name:'Samosa (2 pcs)',       cat:'Veg',     price:80},
+    {id:17,name:'Veg Fried Rice',       cat:'Veg',     price:200},
+    {id:18,name:'Tandoori Chicken',     cat:'Non-Veg', price:440},
+    {id:19,name:'Fish Curry',           cat:'Non-Veg', price:400},
+    {id:20,name:'Prawn Masala',         cat:'Non-Veg', price:480},
+    {id:21,name:'Egg Curry',            cat:'Non-Veg', price:220},
+    {id:22,name:'Chicken Fried Rice',   cat:'Non-Veg', price:260},
+    {id:23,name:'Chicken 65',           cat:'Non-Veg', price:340},
+    {id:24,name:'Veg Pulao',            cat:'Veg',     price:180},
+    {id:25,name:'Raita',               cat:'Veg',     price:80},
+    {id:26,name:'Gulab Jamun (2 pcs)',  cat:'Veg',     price:100},
+    {id:27,name:'Kheer',               cat:'Veg',     price:120},
+    {id:28,name:'Fresh Lime Soda',      cat:'Beverage',price:80},
+    {id:29,name:'Cold Coffee',          cat:'Beverage',price:140},
+    {id:30,name:'Buttermilk',           cat:'Beverage',price:60},
+    {id:31,name:'Watermelon Juice',     cat:'Beverage',price:100},
+    {id:32,name:'Sweet Lassi',          cat:'Beverage',price:110},
+  ],
+  orders: [
+    {id:101, custId:1, custName:'Arjun Mehta',  tableId:2, time:'2025-04-26 12:30', status:'Active',
+     items:[{name:'Paneer Tikka',qty:1,sub:320},{name:'Dal Makhani',qty:2,sub:520},{name:'Garlic Naan',qty:4,sub:240}]},
+    {id:102, custId:2, custName:'Priya Sharma', tableId:6, time:'2025-04-26 13:10', status:'Active',
+     items:[{name:'Butter Chicken',qty:1,sub:360},{name:'Garlic Naan',qty:2,sub:120}]},
+  ],
+  bills: [
+    {billId:201, ordId:101, custName:'Arjun Mehta',  total:1080, tax:54,  final:1134, date:'2025-04-26 12:45'},
+    {billId:202, ordId:99,  custName:'Rahul Verma',  total:760,  tax:38,  final:798,  date:'2025-04-25 19:30'},
+  ],
+  reservations: [
+    {id:301, custName:'Sneha Iyer',  phone:'9543210987', tableId:4,  dt:'2025-04-27 19:00', status:'Confirmed'},
+    {id:302, custName:'Rahul Verma', phone:'7654321098', tableId:9,  dt:'2025-04-28 20:30', status:'Confirmed'},
+    {id:303, custName:'Arjun Mehta', phone:'9876543210', tableId:3,  dt:'2025-04-20 18:00', status:'Cancelled'},
+  ],
+  nextCustId: 5, nextMenuId: 33, nextOrdId: 103, nextBillId: 203, nextResId: 304,
+};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    const saved = JSON.parse(raw);
+    // Ensure arrivals field exists on old customers
+    if (saved.customers) saved.customers.forEach(c => { if (!c.arrivals) c.arrivals = []; });
+    return saved;
+  } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_STATE)); }
+}
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+// ─── State (loaded from localStorage) ────────────────────
+const state = loadState();
+
+let menuFilter = 'All';
+
+// ─── Navigation ───────────────────────────────────────────
+function show(page) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById('screen-' + page).classList.add('active');
+  const navEl = document.getElementById('nav-' + page);
+  if (navEl) navEl.classList.add('active');
+  renderPage(page);
+}
+
+function renderPage(page) {
+  if (page === 'customers')    renderCustomers();
+  if (page === 'tables')       renderTables();
+  if (page === 'menu')         renderMenu();
+  if (page === 'orders')       renderOrders();
+  if (page === 'billing')      renderBilling();
+  if (page === 'reservations') renderReservations();
+  if (page === 'profiles')     renderProfiles();
+}
+
+// ─── Alert ────────────────────────────────────────────────
+function showAlert(id, type, msg) {
+  const el = document.getElementById(id);
+  el.innerHTML = `<div class="alert alert-${type}">${type==='success'?'✅':'❌'} ${msg}</div>`;
+  setTimeout(() => el.innerHTML = '', 3500);
+}
+
+// ─── CUSTOMERS ────────────────────────────────────────────
+function renderCustomers() {
+  document.getElementById('cust-count').textContent = `— ${state.customers.length} total`;
+  const tb = document.getElementById('cust-tbody');
+  tb.innerHTML = state.customers.length ? state.customers.map(c =>
+    `<tr><td><strong>#${c.id}</strong></td><td>${c.name}</td><td>${c.phone}</td>
+     <td style="color:var(--text-light)">${c.email||'—'}</td>
+     <td class="text-sm text-muted">${c.date}</td></tr>`
+  ).join('') : `<tr><td colspan="5" class="text-center text-muted" style="padding:2rem">No customers yet.</td></tr>`;
+}
+
+function addCustomer() {
+  const name=document.getElementById('c-name').value.trim();
+  const phone=document.getElementById('c-phone').value.trim();
+  const email=document.getElementById('c-email').value.trim();
+  if (!name||!phone) return showAlert('cust-alert','error','Name and Phone are required.');
+  if (!/^\d{10}$/.test(phone)) return showAlert('cust-alert','error','Mobile number must be exactly 10 digits.');
+  if (!/^[6-9]/.test(phone)) return showAlert('cust-alert','error','Mobile number must start with 6, 7, 8, or 9.');
+  if (state.customers.find(c=>c.phone===phone)) return showAlert('cust-alert','error','Phone number already registered.');
+  if (email && state.customers.find(c=>c.email===email)) return showAlert('cust-alert','error','Email already registered.');
+  const id = state.nextCustId++;
+  state.customers.unshift({id, name, phone, email: email||'—', date: new Date().toISOString().slice(0,10), arrivals:[]});
+  document.getElementById('c-name').value=''; document.getElementById('c-phone').value=''; document.getElementById('c-email').value='';
+  saveState();
+  renderCustomers();
+  showAlert('cust-alert','success',`Customer registered with ID: #${id} (AddCustomer stored procedure executed)`);
+}
+
+// ─── CUSTOMER PROFILES FOLDER ─────────────────────────────
+function renderProfiles() {
+  const q = (document.getElementById('profile-search')?.value||'').toLowerCase();
+  const customers = state.customers.filter(c =>
+    !q || c.name.toLowerCase().includes(q) || c.phone.includes(q)
+  );
+  document.getElementById('profile-count').textContent = `${customers.length} customer${customers.length!==1?'s':''}`;
+
+  if (!customers.length) {
+    document.getElementById('profiles-list').innerHTML = `<div class="card text-center text-muted" style="padding:2rem">No customers found.</div>`;
+    return;
+  }
+
+  document.getElementById('profiles-list').innerHTML = customers.map(c => {
+    const custOrders = state.orders.filter(o => o.custId === c.id || o.custName === c.name);
+    const custBills  = state.bills.filter(b  => b.custName === c.name);
+    const custRes    = state.reservations.filter(r => r.custName === c.name);
+    const totalSpent = custBills.reduce((s,b)=>s+b.final,0);
+    const visits     = custOrders.length;
+    const arrivals   = (c.arrivals||[]);
+
+    const ordersHTML = custOrders.length ? custOrders.map(o => {
+      const bill = state.bills.find(b=>b.ordId===o.id);
+      return `<div style="background:var(--smoke);border-radius:8px;padding:.85rem 1rem;margin-bottom:.6rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem">
+          <span style="font-weight:600;font-size:.85rem">Order #${o.id} — Table ${o.tableId}</span>
+          <span class="badge b-${o.status==='Active'?'active':'completed'}">${o.status}</span>
+        </div>
+        <div style="font-size:.78rem;color:var(--text-light);margin-bottom:.4rem">🕐 Arrived: ${o.time}</div>
+        <div style="font-size:.82rem">${o.items.map(i=>`<span style="background:var(--border);border-radius:4px;padding:.1rem .5rem;margin-right:.3rem;display:inline-block;margin-bottom:.2rem">${i.name} ×${i.qty}</span>`).join('')}</div>
+        ${bill?`<div style="margin-top:.5rem;font-size:.82rem;font-weight:600;color:var(--saffron)">💰 Bill #${bill.billId}: ₹${bill.final.toFixed(2)} (${bill.date})</div>`:'<div style="margin-top:.4rem;font-size:.78rem;color:var(--text-light)">⏳ Bill not yet generated</div>'}
+      </div>`;
+    }).join('') : `<div style="color:var(--text-light);font-size:.82rem;padding:.5rem 0">No orders yet.</div>`;
+
+    const resHTML = custRes.length ? custRes.map(r=>
+      `<div style="font-size:.8rem;padding:.3rem 0;border-bottom:1px dotted var(--border)">
+        📅 Table ${r.tableId} on ${r.dt} — <span class="badge b-${r.status.toLowerCase()}" style="font-size:.65rem">${r.status}</span>
+      </div>`
+    ).join('') : `<div style="color:var(--text-light);font-size:.8rem">No reservations.</div>`;
+
+    return `
+    <div class="card" style="margin-bottom:1.25rem">
+      <details>
+        <summary style="cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem">
+          <div style="display:flex;align-items:center;gap:1rem">
+            <div style="width:44px;height:44px;border-radius:50%;background:var(--saffron);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1.1rem;flex-shrink:0">${c.name.charAt(0).toUpperCase()}</div>
+            <div>
+              <div style="font-weight:700;font-size:1rem;color:var(--bark)">${c.name}</div>
+              <div style="font-size:.78rem;color:var(--text-light)">📞 ${c.phone} &nbsp;|&nbsp; 📧 ${c.email||'—'} &nbsp;|&nbsp; Since ${c.date}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+            <div style="text-align:center"><div style="font-weight:700;color:var(--saffron);font-size:1.1rem">${visits}</div><div style="font-size:.7rem;color:var(--text-light);text-transform:uppercase">Visits</div></div>
+            <div style="text-align:center"><div style="font-weight:700;color:var(--saffron);font-size:1.1rem">₹${totalSpent.toFixed(0)}</div><div style="font-size:.7rem;color:var(--text-light);text-transform:uppercase">Spent</div></div>
+            <div style="text-align:center"><div style="font-weight:700;color:var(--saffron);font-size:1.1rem">${custRes.length}</div><div style="font-size:.7rem;color:var(--text-light);text-transform:uppercase">Reservations</div></div>
+            <span style="font-size:.75rem;color:var(--saffron);margin-left:.25rem">▼ Open folder</span>
+          </div>
+        </summary>
+
+        <div style="margin-top:1.25rem;border-top:2px solid var(--smoke);padding-top:1.25rem">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+            <div>
+              <div style="font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mid);margin-bottom:.75rem">🧾 Orders & Visits</div>
+              ${ordersHTML}
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mid);margin-bottom:.75rem">📅 Reservations</div>
+              ${resHTML}
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>`;
+  }).join('');
+}
+
+// ─── TABLES ───────────────────────────────────────────────
+function renderTables() {
+  const avail = state.tables.filter(t=>t.status==='Available').length;
+  const occ   = state.tables.filter(t=>t.status==='Occupied').length;
+  const res   = state.tables.filter(t=>t.status==='Reserved').length;
+
+  document.getElementById('tbl-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-icon">🟢</div><div class="stat-value">${avail}</div><div class="stat-label">Available</div></div>
+    <div class="stat-card"><div class="stat-icon">🟠</div><div class="stat-value">${occ}</div><div class="stat-label">Occupied</div></div>
+    <div class="stat-card"><div class="stat-icon">🔵</div><div class="stat-value">${res}</div><div class="stat-label">Reserved</div></div>
+    <div class="stat-card"><div class="stat-icon">🪑</div><div class="stat-value">${state.tables.length}</div><div class="stat-label">Total Tables</div></div>`;
+
+  document.getElementById('floor-grid').innerHTML = state.tables.map(t => {
+    const cls = t.status.toLowerCase();
+    return `<div class="t-card ${cls}" onclick="promptTableStatus(${t.id})">
+      <div class="t-num">T${t.id}</div>
+      <div class="t-cap">👤 ${t.cap} seats</div>
+      <span class="badge b-${cls}">${t.status}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('tbl-tbody').innerHTML = state.tables.map(t => `
+    <tr><td><strong>Table ${t.id}</strong></td><td>${t.cap} persons</td>
+    <td><span class="badge b-${t.status.toLowerCase()}">${t.status}</span></td>
+    <td><button class="btn btn-outline btn-sm" onclick="promptTableStatus(${t.id})">Change Status</button></td></tr>`
+  ).join('');
+}
+
+function promptTableStatus(id) {
+  const t = state.tables.find(x=>x.id===id);
+  const s = prompt(`Table ${id} — current: ${t.status}\nEnter new status (Available / Occupied / Reserved):`, t.status);
+  if (s && ['Available','Occupied','Reserved'].includes(s)) {
+    t.status = s;
+    saveState();
+    renderTables();
+    showAlert('tbl-alert','success',`Table ${id} updated to "${s}" (UpdateTableStatus procedure executed)`);
+  } else if (s) {
+    showAlert('tbl-alert','error','Invalid status. Use: Available, Occupied, or Reserved');
+  }
+}
+
+// ─── MENU ─────────────────────────────────────────────────
+function renderMenu() {
+  const filtered = menuFilter === 'All' ? state.menu : state.menu.filter(m=>m.cat===menuFilter);
+  document.getElementById('menu-grid').innerHTML = filtered.length ? filtered.map(m => {
+    const bc = m.cat==='Veg'?'veg':m.cat==='Non-Veg'?'nonveg':'beverage';
+    return `<div class="mi-card" data-cat="${m.cat}">
+      <div><div class="mi-name">${m.name}</div>
+      <div style="font-size:.75rem;margin-top:.2rem"><span class="badge b-${bc}">${m.cat}</span></div></div>
+      <div style="text-align:right">
+        <div class="mi-price">₹${m.price}</div>
+        <button class="btn btn-danger btn-sm" style="margin-top:.5rem" onclick="deleteMenuItem(${m.id})">🗑</button>
+      </div></div>`;
+  }).join('') : '<p class="text-muted" style="padding:1rem">No items in this category.</p>';
+}
+
+function addMenuItem() {
+  const name=document.getElementById('m-name').value.trim();
+  const cat=document.getElementById('m-cat').value;
+  const price=parseFloat(document.getElementById('m-price').value);
+  if (!name||!cat||!price||price<=0) return showAlert('menu-alert','error','All fields are required and price must be > 0.');
+  state.menu.unshift({id:state.nextMenuId++, name, cat, price});
+  document.getElementById('m-name').value=''; document.getElementById('m-cat').value=''; document.getElementById('m-price').value='';
+  saveState();
+  renderMenu();
+  showAlert('menu-alert','success',`"${name}" added to menu successfully.`);
+}
+
+function deleteMenuItem(id) {
+  if (!confirm('Delete this menu item?')) return;
+  const idx = state.menu.findIndex(m=>m.id===id);
+  if (idx > -1) { state.menu.splice(idx,1); saveState(); renderMenu(); showAlert('menu-alert','success','Menu item deleted.'); }
+}
+
+function filterMenu(cat, btn) {
+  menuFilter = cat;
+  document.querySelectorAll('#screen-menu .tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMenu();
+}
+
+// ─── ORDERS ───────────────────────────────────────────────
+function renderOrders() {
+  const ocd = document.getElementById('o-cust');
+  ocd.innerHTML = '<option value="">— Select Customer —</option>' +
+    state.customers.map(c=>`<option value="${c.id}">${c.name} (📞 ${c.phone})</option>`).join('');
+
+  const otd = document.getElementById('o-tbl');
+  const avail = state.tables.filter(t=>t.status==='Available');
+  otd.innerHTML = '<option value="">— Select Table —</option>' +
+    avail.map(t=>`<option value="${t.id}">Table ${t.id} (👤 ${t.cap} seats)</option>`).join('');
+
+  const activeOrds = state.orders.filter(o=>o.status==='Active');
+  const aod = document.getElementById('o-ord');
+  aod.innerHTML = '<option value="">— Select Order —</option>' +
+    activeOrds.map(o=>`<option value="${o.id}">Order #${o.id} — ${o.custName} (Table ${o.tableId})</option>`).join('');
+
+  const mid = document.getElementById('o-item');
+  mid.innerHTML = '<option value="">— Select Item —</option>' +
+    state.menu.map(m=>`<option value="${m.id}">${m.name} (${m.cat}) — ₹${m.price}</option>`).join('');
+
+  document.getElementById('ord-tbody').innerHTML = activeOrds.length ? activeOrds.map(o => {
+    const total = o.items.reduce((s,i)=>s+i.sub,0);
+    return `<tr>
+      <td><strong>#${o.id}</strong></td><td>${o.custName}</td><td>Table ${o.tableId}</td>
+      <td class="text-sm text-muted">${o.time}</td>
+      <td class="text-sm">${o.items.map(i=>`${i.name}×${i.qty}`).join(', ')} <br><span style="color:var(--saffron);font-weight:600">₹${total}</span></td>
+      <td><div class="flex gap-1">
+        <button class="btn btn-outline btn-sm" onclick="show('billing');document.getElementById('b-ordid').value=${o.id};viewBill()">💰 Bill</button>
+        <button class="btn btn-success btn-sm" onclick="completeOrder(${o.id})">✔ Complete</button>
+      </div></td></tr>`;
+  }).join('') : '<tr><td colspan="6" class="text-center text-muted" style="padding:2rem">No active orders.</td></tr>';
+}
+
+function createOrder() {
+  const custId=parseInt(document.getElementById('o-cust').value);
+  const tableId=parseInt(document.getElementById('o-tbl').value);
+  if (!custId||!tableId) return showAlert('ord-alert','error','Please select both customer and table.');
+  const t = state.tables.find(x=>x.id===tableId);
+  if (t.status !== 'Available') return showAlert('ord-alert','error','Table is not available (CreateOrder error code -2).');
+  const cust = state.customers.find(c=>c.id===custId);
+  t.status = 'Occupied';
+  const arrivalTime = new Date().toLocaleString();
+  if (!cust.arrivals) cust.arrivals = [];
+  cust.arrivals.unshift(arrivalTime); // Log arrival time
+  const id = state.nextOrdId++;
+  state.orders.push({id, custId, custName:cust.name, tableId, time:arrivalTime, status:'Active', items:[]});
+  saveState();
+  renderOrders();
+  showAlert('ord-alert','success',`Order #${id} created. Table ${tableId} → Occupied (AfterOrderInsert trigger fired)`);
+}
+
+function addOrderItem() {
+  const ordId=parseInt(document.getElementById('o-ord').value);
+  const itemId=parseInt(document.getElementById('o-item').value);
+  const qty=parseInt(document.getElementById('o-qty').value)||1;
+  if (!ordId||!itemId) return showAlert('ord-alert','error','Please select an order and menu item.');
+  const ord = state.orders.find(o=>o.id===ordId);
+  const item = state.menu.find(m=>m.id===itemId);
+  ord.items.push({name:item.name, qty, sub:item.price*qty});
+  const total = ord.items.reduce((s,i)=>s+i.sub,0);
+  const existBill = state.bills.find(b=>b.ordId===ordId);
+  if (existBill) { existBill.total=total; existBill.tax=Math.round(total*0.05*100)/100; existBill.final=existBill.total+existBill.tax; }
+  saveState();
+  renderOrders();
+  showAlert('ord-alert','success',`${item.name} ×${qty} added to Order #${ordId}. Bill auto-updated (AfterOrderDetailInsert trigger fired)`);
+}
+
+function completeOrder(id) {
+  if (!confirm(`Mark Order #${id} as completed?`)) return;
+  const ord = state.orders.find(o=>o.id===id);
+  const t   = state.tables.find(t=>t.id===ord.tableId);
+  ord.status = 'Completed';
+  t.status = 'Available';
+  saveState();
+  renderOrders();
+  showAlert('ord-alert','success',`Order #${id} completed. Table ${ord.tableId} → Available (AfterOrderUpdate trigger fired)`);
+}
+
+function oTab(name, btn) {
+  document.querySelectorAll('#screen-orders .tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#screen-orders .tab-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('ot-'+name).classList.add('active');
+}
+
+// ─── BILLING ─────────────────────────────────────────────
+function renderBilling() {
+  document.getElementById('bill-tbody').innerHTML = state.bills.length ? state.bills.map(b =>
+    `<tr><td><strong>#${b.billId}</strong></td><td>#${b.ordId}</td><td>${b.custName}</td>
+     <td style="font-weight:700;color:var(--saffron)">₹${b.final.toFixed(2)}</td>
+     <td class="text-sm text-muted">${b.date}</td></tr>`
+  ).join('') : '<tr><td colspan="5" class="text-center text-muted" style="padding:1.5rem">No bills yet.</td></tr>';
+}
+
+function generateBill() {
+  const ordId = parseInt(document.getElementById('b-ordid').value);
+  if (!ordId) return showAlert('bill-alert','error','Please enter a valid Order ID.');
+  const ord = state.orders.find(o=>o.id===ordId);
+  if (!ord) return showAlert('bill-alert','error',`Order #${ordId} not found.`);
+  const total = ord.items.reduce((s,i)=>s+i.sub,0);
+  if (total===0) return showAlert('bill-alert','error','Order has no items. Add items before generating a bill.');
+  const tax = Math.round(total*0.05*100)/100;
+  const final = total+tax;
+  let bill = state.bills.find(b=>b.ordId===ordId);
+  if (!bill) {
+    bill = {billId:state.nextBillId++, ordId, custName:ord.custName, total, tax, final, date:new Date().toLocaleString()};
+    state.bills.unshift(bill);
+  } else { bill.total=total; bill.tax=tax; bill.final=final; }
+
+  // Auto-complete order and release table
+  if (ord.status === 'Active') {
+    ord.status = 'Completed';
+    const t = state.tables.find(t=>t.id===ord.tableId);
+    if (t) { t.status = 'Available'; }
+  }
+
+  saveState();
+  renderBilling();
+  showAlert('bill-alert','success',`Bill #${bill.billId} generated. Table ${ord.tableId} auto-released → Available (GenerateBill + AfterOrderUpdate triggers fired)`);
+  renderReceiptFor(ordId);
+}
+
+function printBillOnly(ordId) {
+  const bill = state.bills.find(b=>b.ordId===ordId);
+  const ord  = state.orders.find(o=>o.id===ordId);
+  if (!bill||!ord) return;
+  const itemRows = ord.items.map(i=>`
+    <tr><td>${i.name} × ${i.qty}</td><td style="text-align:right">₹${i.sub.toFixed(2)}</td></tr>
+  `).join('');
+  const w = window.open('','_blank','width=480,height=700');
+  w.document.write(`<!DOCTYPE html><html><head><title>Bill #${bill.billId}</title>
+  <style>
+    body{font-family:'Segoe UI',sans-serif;padding:2rem;max-width:400px;margin:0 auto;color:#1A1005;}
+    h1{font-size:1.8rem;text-align:center;color:#5C3D1E;margin-bottom:.2rem;}
+    .sub{text-align:center;font-size:.8rem;color:#8B7355;margin-bottom:1.5rem;}
+    table{width:100%;border-collapse:collapse;font-size:.9rem;}
+    th{text-align:left;border-bottom:2px solid #ccc;padding:.4rem 0;font-size:.75rem;text-transform:uppercase;color:#8B7355;}
+    td{padding:.35rem 0;border-bottom:1px dotted #ddd;}
+    .total-row td{border-top:2px solid #5C3D1E;border-bottom:none;font-weight:700;font-size:1.05rem;padding-top:.6rem;}
+    .footer{text-align:center;margin-top:1.5rem;font-size:.75rem;color:#8B7355;}
+    @media print{body{padding:.5rem}}
+  </style></head><body>
+  <h1>🌶️ Spice Route</h1>
+  <div class="sub">Restaurant Management Portal<br>
+  <strong>Bill #${bill.billId}</strong> | Order #${bill.ordId} | ${bill.date}</div>
+  <table>
+    <tr><th>Customer</th><td style="text-align:right"><strong>${bill.custName}</strong></td></tr>
+    <tr><th>Table</th><td style="text-align:right">Table ${ord.tableId}</td></tr>
+  </table>
+  <br>
+  <table>
+    <thead><tr><th>Item</th><th style="text-align:right">Amount</th></tr></thead>
+    <tbody>${itemRows}</tbody>
+    <tfoot>
+      <tr><td>Subtotal</td><td style="text-align:right">₹${bill.total.toFixed(2)}</td></tr>
+      <tr><td>GST (5%)</td><td style="text-align:right">₹${bill.tax.toFixed(2)}</td></tr>
+      <tr class="total-row"><td>Total</td><td style="text-align:right">₹${bill.final.toFixed(2)}</td></tr>
+    </tfoot>
+  </table>
+  <div class="footer">Thank you for dining at Spice Route! 🙏</div>
+  <script>window.onload=function(){window.print();}<\/script>
+  </body></html>`);
+  w.document.close();
+}
+
+function viewBill() {
+  const ordId = parseInt(document.getElementById('b-ordid').value);
+  if (!ordId) return showAlert('bill-alert','error','Please enter a valid Order ID.');
+  const bill = state.bills.find(b=>b.ordId===ordId);
+  if (!bill) return showAlert('bill-alert','error',`No bill found for Order #${ordId}. Generate it first.`);
+  renderReceiptFor(ordId);
+}
+
+function renderReceiptFor(ordId) {
+  const bill = state.bills.find(b=>b.ordId===ordId);
+  const ord  = state.orders.find(o=>o.id===ordId);
+  if (!bill||!ord) return;
+  const itemRows = ord.items.map(i=>`<div class="rrow" style="border-color:transparent"><span>${i.name} × ${i.qty}</span><span>₹${i.sub.toFixed(2)}</span></div>`).join('');
+  document.getElementById('receipt-area').innerHTML = `
+    <div class="card">
+      <div class="receipt">
+        <div class="rh"><div class="rname">🌶️ Spice Route</div>
+          <div style="font-size:.78rem;color:var(--text-light);margin-top:.2rem">Restaurant Management Portal</div>
+          <div style="font-size:.75rem;margin-top:.4rem;color:var(--text-mid)">Bill #${bill.billId} &nbsp;|&nbsp; Order #${bill.ordId}</div>
+        </div>
+        <div class="rrow"><span>Customer</span><span><strong>${bill.custName}</strong></span></div>
+        <div class="rrow"><span>Table</span><span>Table ${ord.tableId}</span></div>
+        <div class="rrow"><span>Date</span><span>${bill.date}</span></div>
+        <div style="margin:1rem 0 .4rem;font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-light)">Items</div>
+        ${itemRows}
+        <div class="rrow" style="margin-top:.5rem"><span>Subtotal</span><span>₹${bill.total.toFixed(2)}</span></div>
+        <div class="rrow"><span>GST (5%)</span><span>₹${bill.tax.toFixed(2)}</span></div>
+        <div class="rtotal"><span>Total</span><span>₹${bill.final.toFixed(2)}</span></div>
+        <div style="text-align:center;margin-top:1.5rem;font-size:.75rem;color:var(--text-light)">Thank you for dining at Spice Route! 🙏</div>
+      </div>
+      <button onclick="printBillOnly(${bill.ordId})" class="btn btn-dark" style="margin-top:1rem">🖨️ Print Bill</button>
+    </div>`;
+}
+
+// ─── RESERVATIONS ─────────────────────────────────────────
+function renderReservations() {
+  document.getElementById('r-cust').innerHTML = '<option value="">— Select Customer —</option>' +
+    state.customers.map(c=>`<option value="${c.id}">${c.name} (📞 ${c.phone})</option>`).join('');
+
+  document.getElementById('r-tbl').innerHTML = '<option value="">— Select Table —</option>' +
+    state.tables.filter(t=>t.status!=='Occupied').map(t=>`<option value="${t.id}">Table ${t.id} (👤 ${t.cap} seats — ${t.status})</option>`).join('');
+
+  document.getElementById('r-dt').min = new Date().toISOString().slice(0,16);
+
+  document.getElementById('res-tbody').innerHTML = state.reservations.length ? state.reservations.map(r => `
+    <tr><td><strong>#${r.id}</strong></td>
+    <td>${r.custName}<div class="text-sm text-muted">${r.phone}</div></td>
+    <td>Table ${r.tableId}</td>
+    <td class="text-sm">${r.dt}</td>
+    <td><span class="badge b-${r.status.toLowerCase()}">${r.status}</span></td>
+    <td>${r.status==='Confirmed'?`<button class="btn btn-danger btn-sm" onclick="cancelReservation(${r.id})">Cancel</button>`:'<span class="text-muted text-sm">—</span>'}</td></tr>`
+  ).join('') : '<tr><td colspan="6" class="text-center text-muted" style="padding:2rem">No reservations.</td></tr>';
+}
+
+function makeReservation() {
+  const custId=parseInt(document.getElementById('r-cust').value);
+  const tableId=parseInt(document.getElementById('r-tbl').value);
+  const dt=document.getElementById('r-dt').value;
+  if (!custId||!tableId||!dt) return showAlert('res-alert','error','All fields are required.');
+  if (new Date(dt) <= new Date()) return showAlert('res-alert','error','Please select a future date and time.');
+  const t = state.tables.find(x=>x.id===tableId);
+  if (t.status==='Occupied') return showAlert('res-alert','error','Table is occupied — cannot reserve (ReserveTable error code -3).');
+  const conflict = state.reservations.find(r => r.tableId===tableId && r.status==='Confirmed' &&
+    Math.abs(new Date(dt)-new Date(r.dt))/60000 < 120);
+  if (conflict) return showAlert('res-alert','error','Table already booked within 2 hours of that time (ReserveTable error code -2).');
+  const cust = state.customers.find(c=>c.id===custId);
+  const id = state.nextResId++;
+  state.reservations.unshift({id, custName:cust.name, phone:cust.phone, tableId, dt, status:'Confirmed'});
+  t.status = 'Reserved';
+  document.getElementById('r-dt').value='';
+  saveState();
+  renderReservations();
+  showAlert('res-alert','success',`Reservation #${id} confirmed. Table ${tableId} → Reserved (AfterReservationInsert trigger fired)`);
+}
+
+function cancelReservation(id) {
+  if (!confirm(`Cancel reservation #${id}?`)) return;
+  const r = state.reservations.find(x=>x.id===id);
+  r.status = 'Cancelled';
+  const others = state.reservations.filter(x=>x.tableId===r.tableId && x.status==='Confirmed');
+  if (!others.length) {
+    const t = state.tables.find(x=>x.id===r.tableId);
+    if (t.status==='Reserved') t.status='Available';
+  }
+  saveState();
+  renderReservations();
+  showAlert('res-alert','success',`Reservation #${id} cancelled. Table ${r.tableId} → Available (AfterReservationUpdate trigger fired)`);
+}
+
+// ─── Init ─────────────────────────────────────────────────
+renderPage('home');
+</script>
+
+<!-- ════════════ SQL QUERY PANEL ════════════ -->
+<div class="screen" id="screen-sqlpanel">
+  <div class="page">
+    <div class="ph">
+      <h1 class="page-title">🗄️ SQL Query Panel</h1>
+      <p class="page-sub">Run live SQL SELECT queries against the in-memory database — all your data, explorable in real time.</p>
+    </div>
+
+    <div class="sql-layout">
+      <!-- LEFT: Sidebar -->
+      <div>
+        <!-- Schema Reference -->
+        <div class="card" style="margin-bottom:1.25rem">
+          <div class="card-title" style="font-size:1rem;margin-bottom:1rem">📐 Schema</div>
+          <div class="sql-cat">Tables</div>
+          <div>
+            <span class="schema-pill">customers</span>
+            <span class="schema-pill">tables</span>
+            <span class="schema-pill">menu</span>
+            <span class="schema-pill">orders</span>
+            <span class="schema-pill">bills</span>
+            <span class="schema-pill">reservations</span>
+          </div>
+          <div class="sql-cat" style="margin-top:1rem">customers</div>
+          <div style="font-size:.72rem;font-family:'Courier New',monospace;color:var(--text-mid);line-height:1.9">
+            id, name, phone,<br>email, date, arrivals[]
+          </div>
+          <div class="sql-cat">tables</div>
+          <div style="font-size:.72rem;font-family:'Courier New',monospace;color:var(--text-mid);line-height:1.9">
+            id, cap, status
+          </div>
+          <div class="sql-cat">menu</div>
+          <div style="font-size:.72rem;font-family:'Courier New',monospace;color:var(--text-mid);line-height:1.9">
+            id, name, cat, price
+          </div>
+          <div class="sql-cat">orders</div>
+          <div style="font-size:.72rem;font-family:'Courier New',monospace;color:var(--text-mid);line-height:1.9">
+            id, custId, custName,<br>tableId, time, status, items[]
+          </div>
+          <div class="sql-cat">bills</div>
+          <div style="font-size:.72rem;font-family:'Courier New',monospace;color:var(--text-mid);line-height:1.9">
+            billId, ordId, custName,<br>total, tax, final, date
+          </div>
+          <div class="sql-cat">reservations</div>
+          <div style="font-size:.72rem;font-family:'Courier New',monospace;color:var(--text-mid);line-height:1.9">
+            id, custName, phone,<br>tableId, dt, status
+          </div>
+        </div>
+
+        <!-- Snippet Library -->
+        <div class="card">
+          <div class="card-title" style="font-size:1rem;margin-bottom:.75rem">⚡ Quick Queries</div>
+
+          <div class="sql-cat">Customers</div>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT * FROM customers
+<small>All customer records</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT id, name, phone FROM customers WHERE email IS NOT NULL
+<small>Customers with email</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT COUNT(*) AS total_customers FROM customers
+<small>Customer count</small></code>
+
+          <div class="sql-cat">Tables</div>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT * FROM tables
+<small>All table statuses</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT * FROM tables WHERE status = 'Available'
+<small>Available tables only</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT status, COUNT(*) AS count FROM tables GROUP BY status
+<small>Table status summary</small></code>
+
+          <div class="sql-cat">Menu</div>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT * FROM menu ORDER BY price DESC
+<small>All menu items, most expensive first</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT * FROM menu WHERE cat = 'Veg'
+<small>Veg items only</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT cat, COUNT(*) AS items, AVG(price) AS avg_price FROM menu GROUP BY cat
+<small>Category summary with averages</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT * FROM menu WHERE price > 300 ORDER BY price
+<small>Premium items (price &gt; ₹300)</small></code>
+
+          <div class="sql-cat">Orders</div>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT * FROM orders
+<small>All orders</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT * FROM orders WHERE status = 'Active'
+<small>Active orders only</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT id, custName, tableId, status FROM orders ORDER BY id DESC
+<small>Orders summary (latest first)</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT custName, COUNT(*) AS order_count FROM orders GROUP BY custName ORDER BY order_count DESC
+<small>Orders per customer</small></code>
+
+          <div class="sql-cat">Billing</div>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT * FROM bills
+<small>All bills</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT custName, final AS total_paid FROM bills ORDER BY final DESC
+<small>Highest spenders</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT SUM(final) AS total_revenue, AVG(final) AS avg_bill, COUNT(*) AS bill_count FROM bills
+<small>Revenue summary</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT custName, SUM(final) AS lifetime_value FROM bills GROUP BY custName ORDER BY lifetime_value DESC
+<small>Customer lifetime value</small></code>
+
+          <div class="sql-cat">Reservations</div>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT * FROM reservations
+<small>All reservations</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT * FROM reservations WHERE status = 'Confirmed'
+<small>Confirmed bookings only</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT custName, COUNT(*) AS bookings FROM reservations GROUP BY custName
+<small>Bookings per customer</small></code>
+
+          <div class="sql-cat">Joins & Analytics</div>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT c.name, c.phone, o.id AS order_id, o.status FROM customers AS c JOIN orders AS o ON c.id = o.custId
+<small>Customers joined with their orders</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT o.custName, b.final AS billed, o.tableId FROM orders AS o JOIN bills AS b ON o.id = b.ordId
+<small>Orders joined with billing data</small></code>
+          <code class="sql-snippet" onclick="loadSnippet(this)">SELECT custName, COUNT(*) AS reservations, MAX(dt) AS latest FROM reservations GROUP BY custName ORDER BY reservations DESC
+<small>Reservation frequency analysis</small></code>
+        </div>
+      </div>
+
+      <!-- RIGHT: Editor + Results -->
+      <div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+            <div class="card-title" style="margin-bottom:0">Query Editor</div>
+            <div style="display:flex;gap:.5rem">
+              <button class="btn btn-outline btn-sm" onclick="clearEditor()">🗑 Clear</button>
+              <button class="btn btn-outline btn-sm" onclick="formatQuery()">✨ Format</button>
+            </div>
+          </div>
+          <div class="sql-editor-wrap">
+            <textarea class="sql-editor" id="sql-input" spellcheck="false"
+              placeholder="-- Type your SQL SELECT query here&#10;-- Example: SELECT * FROM customers&#10;&#10;SELECT * FROM customers"
+              onkeydown="handleSqlKey(event)">SELECT * FROM customers</textarea>
+          </div>
+          <div class="sql-run-bar">
+            <button class="btn btn-primary" onclick="runQuery()" style="gap:.5rem">
+              ▶ Run Query <kbd style="background:rgba(255,255,255,.2);border-radius:4px;padding:.1rem .4rem;font-size:.7rem">Ctrl+Enter</kbd>
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="exportCSV()">📥 Export CSV</button>
+            <span id="sql-status" class="sql-status"></span>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div class="card" style="margin-top:1.25rem">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+            <div class="card-title" style="margin-bottom:0">
+              Results <span id="sql-rows-badge" class="sql-rows-badge" style="display:none"></span>
+            </div>
+            <div id="sql-exec-time" style="font-size:.75rem;color:var(--text-light);font-family:'Courier New',monospace"></div>
+          </div>
+          <div id="sql-output">
+            <div class="sql-empty">▶ Run a query to see results here</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  SQL QUERY ENGINE — runs SQL against in-memory JS data
+// ════════════════════════════════════════════════════════
+
+// ── Virtual Tables ──────────────────────────────────────
+// Maps table names to live state arrays with flat column projection
+function getVirtualTables() {
+  return {
+    customers: state.customers.map(c => ({
+      id: c.id, name: c.name, phone: c.phone,
+      email: c.email || null, date: c.date,
+      arrivals: (c.arrivals || []).join(', ') || null
+    })),
+    tables: state.tables.map(t => ({
+      id: t.id, cap: t.cap, status: t.status
+    })),
+    menu: state.menu.map(m => ({
+      id: m.id, name: m.name, cat: m.cat, price: m.price
+    })),
+    orders: state.orders.map(o => ({
+      id: o.id, custId: o.custId, custName: o.custName,
+      tableId: o.tableId, time: o.time, status: o.status,
+      item_count: o.items.length,
+      total: o.items.reduce((s,i)=>s+i.sub,0)
+    })),
+    bills: state.bills.map(b => ({
+      billId: b.billId, ordId: b.ordId, custName: b.custName,
+      total: b.total, tax: b.tax, final: b.final, date: b.date
+    })),
+    reservations: state.reservations.map(r => ({
+      id: r.id, custName: r.custName, phone: r.phone,
+      tableId: r.tableId, dt: r.dt, status: r.status
+    }))
+  };
+}
+
+// ── SQL Parser & Executor ───────────────────────────────
+function parseAndRun(sql) {
+  const tables = getVirtualTables();
+  const raw = sql.trim().replace(/\s+/g,' ');
+
+  if (!/^SELECT\s/i.test(raw)) throw new Error('Only SELECT queries are supported in this panel.');
+
+  // ── Parse FROM ──────────────────────────────────────
+  const fromMatch = raw.match(/\bFROM\s+(\w+)(?:\s+(?:AS\s+)?(\w+))?/i);
+  if (!fromMatch) throw new Error('Missing FROM clause.');
+  const tableName = fromMatch[1].toLowerCase();
+  const tableAlias = fromMatch[2] || fromMatch[1];
+  if (!tables[tableName]) throw new Error(`Unknown table "${tableName}". Available: ${Object.keys(tables).join(', ')}`);
+
+  let rows = tables[tableName].map(r => ({ ...r }));
+
+  // ── Parse JOIN ──────────────────────────────────────
+  const joinMatch = raw.match(/\bJOIN\s+(\w+)(?:\s+(?:AS\s+)?(\w+))?\s+ON\s+(.+?)(?=\s+WHERE|\s+GROUP|\s+ORDER|\s+LIMIT|$)/i);
+  let joinAlias = null;
+  if (joinMatch) {
+    const jTableName = joinMatch[1].toLowerCase();
+    joinAlias = joinMatch[2] || joinMatch[1];
+    if (!tables[jTableName]) throw new Error(`JOIN table "${jTableName}" not found.`);
+    const jRows = tables[jTableName].map(r => ({ ...r }));
+    const onClause = joinMatch[3].trim();
+    // Parse ON  a.col = b.col
+    const onParts = onClause.match(/(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)/);
+    if (!onParts) throw new Error('Could not parse ON clause. Use format: table1.col = table2.col');
+    const [, a1, c1, a2, c2] = onParts;
+    const merged = [];
+    for (const r of rows) {
+      for (const j of jRows) {
+        const lv = (a1 === tableAlias || a1 === tableName) ? r[c1] : j[c1];
+        const rv = (a2 === joinAlias  || a2 === jTableName) ? j[c2] : r[c2];
+        if (lv !== undefined && rv !== undefined && lv == rv) {
+          const combined = {};
+          for (const k in r) combined[`${tableAlias}.${k}`] = r[k];
+          for (const k in j) combined[`${joinAlias}.${k}`] = j[k];
+          // Also flat keys (last-write-wins for ambiguous columns)
+          Object.assign(combined, r);
+          for (const k in j) if (!(k in r)) combined[k] = j[k];
+          merged.push(combined);
+        }
+      }
+    }
+    rows = merged;
+  }
+
+  // ── Parse WHERE ─────────────────────────────────────
+  const whereMatch = raw.match(/\bWHERE\s+(.+?)(?=\s+GROUP BY|\s+ORDER BY|\s+LIMIT|$)/i);
+  if (whereMatch) {
+    rows = applyWhere(rows, whereMatch[1].trim());
+  }
+
+  // ── Parse GROUP BY + aggregates ─────────────────────
+  const groupMatch = raw.match(/\bGROUP\s+BY\s+(.+?)(?=\s+ORDER BY|\s+LIMIT|$)/i);
+  const selectRaw = extractSelectCols(raw);
+
+  if (groupMatch) {
+    const groupCols = groupMatch[1].split(',').map(s => s.trim().replace(/\w+\./,''));
+    rows = applyGroupBy(rows, groupCols, selectRaw);
+  }
+
+  // ── Parse SELECT columns ─────────────────────────────
+  rows = applySelect(rows, selectRaw, !groupMatch);
+
+  // ── Parse ORDER BY ───────────────────────────────────
+  const orderMatch = raw.match(/\bORDER\s+BY\s+(.+?)(?=\s+LIMIT|$)/i);
+  if (orderMatch) {
+    rows = applyOrderBy(rows, orderMatch[1].trim());
+  }
+
+  // ── Parse LIMIT ──────────────────────────────────────
+  const limitMatch = raw.match(/\bLIMIT\s+(\d+)/i);
+  if (limitMatch) rows = rows.slice(0, parseInt(limitMatch[1]));
+
+  return rows;
+}
+
+// ── Extract SELECT column list ────────────────────────
+function extractSelectCols(sql) {
+  const m = sql.match(/^SELECT\s+(.+?)\s+FROM\s/i);
+  if (!m) throw new Error('Cannot parse SELECT columns.');
+  return m[1].trim();
+}
+
+// ── Apply SELECT projections + aliases ───────────────
+function applySelect(rows, colsRaw, applyAgg) {
+  if (colsRaw.trim() === '*') return rows;
+  const cols = splitSelectCols(colsRaw);
+  return rows.map(row => {
+    const out = {};
+    for (const col of cols) {
+      const aggM = col.match(/^(COUNT|SUM|AVG|MIN|MAX)\s*\(\s*\*?\s*(\w+)?\s*\)\s*(?:AS\s+(\w+))?$/i);
+      if (aggM) {
+        // Already computed by groupBy
+        const alias = aggM[3] || `${aggM[1].toLowerCase()}(${aggM[2]||'*'})`;
+        out[alias] = row[alias] !== undefined ? row[alias] : row[`${aggM[1].toUpperCase()}(${aggM[2]||'*'})`];
+        continue;
+      }
+      const asM = col.match(/^(.+?)\s+AS\s+(\w+)$/i);
+      const expr = asM ? asM[1].trim() : col.trim();
+      const alias = asM ? asM[2] : expr.replace(/\w+\./,'');
+      // Resolve dotted col: table.col
+      const dotM = expr.match(/^(\w+)\.(\w+)$/);
+      const key = dotM ? dotM[2] : expr;
+      const keys = Object.keys(row).filter(k => k === key || k.endsWith('.'+key));
+      out[alias] = keys.length ? row[keys[0]] : null;
+    }
+    return out;
+  });
+}
+
+// ── Split SELECT cols respecting parentheses ──────────
+function splitSelectCols(s) {
+  const cols = [], parts = s.split(',');
+  let buf = '';
+  for (const p of parts) {
+    buf += (buf ? ',' : '') + p;
+    const opens = (buf.match(/\(/g)||[]).length;
+    const closes = (buf.match(/\)/g)||[]).length;
+    if (opens === closes) { cols.push(buf.trim()); buf = ''; }
+  }
+  if (buf) cols.push(buf.trim());
+  return cols;
+}
+
+// ── Apply WHERE ───────────────────────────────────────
+function applyWhere(rows, where) {
+  const conditions = parseConditions(where);
+  return rows.filter(row => evalConditions(row, conditions));
+}
+
+function parseConditions(expr) {
+  // Split on AND / OR (simple, non-nested)
+  const parts = expr.split(/\s+(AND|OR)\s+/i);
+  const conds = [], ops = [];
+  for (let i = 0; i < parts.length; i++) {
+    if (/^AND$/i.test(parts[i])) { ops.push('AND'); }
+    else if (/^OR$/i.test(parts[i])) { ops.push('OR'); }
+    else { conds.push(parseSingleCond(parts[i])); }
+  }
+  return { conds, ops };
+}
+
+function parseSingleCond(expr) {
+  expr = expr.trim().replace(/^\(|\)$/g,'');
+  // IS NOT NULL / IS NULL
+  const nullM = expr.match(/^(.+?)\s+IS\s+(NOT\s+)?NULL$/i);
+  if (nullM) return { col: nullM[1].trim().replace(/\w+\./,''), op: nullM[2] ? 'IS NOT NULL' : 'IS NULL', val: null };
+  // LIKE
+  const likeM = expr.match(/^(.+?)\s+(?:NOT\s+)?LIKE\s+'([^']*)'/i);
+  if (likeM) return { col: likeM[1].trim().replace(/\w+\./,''), op: 'LIKE', val: likeM[2] };
+  // IN (...)
+  const inM = expr.match(/^(.+?)\s+IN\s*\(([^)]+)\)/i);
+  if (inM) return { col: inM[1].trim().replace(/\w+\./,''), op: 'IN', val: inM[2].split(',').map(s=>s.trim().replace(/^'|'$/g,'')) };
+  // Comparison: =, !=, <>, >=, <=, >, <
+  const cmpM = expr.match(/^(.+?)\s*(>=|<=|!=|<>|>|<|=)\s*('([^']*)'|(\d+(?:\.\d+)?)|(\w+))$/);
+  if (cmpM) {
+    const raw = cmpM[3];
+    const val = cmpM[4] !== undefined ? cmpM[4] : (cmpM[5] !== undefined ? parseFloat(cmpM[5]) : cmpM[6]);
+    return { col: cmpM[1].trim().replace(/\w+\./,''), op: cmpM[2], val };
+  }
+  throw new Error(`Cannot parse condition: "${expr}"`);
+}
+
+function evalConditions(row, { conds, ops }) {
+  if (!conds.length) return true;
+  let result = evalCond(row, conds[0]);
+  for (let i = 0; i < ops.length; i++) {
+    const next = evalCond(row, conds[i+1]);
+    result = ops[i].toUpperCase() === 'AND' ? result && next : result || next;
+  }
+  return result;
+}
+
+function evalCond(row, {col, op, val}) {
+  // Resolve column (supports dotted)
+  const keys = Object.keys(row).filter(k => k === col || k.endsWith('.'+col));
+  const v = keys.length ? row[keys[0]] : undefined;
+  const s = v === null || v === undefined ? null : String(v);
+  switch(op) {
+    case '=':  return s == String(val);
+    case '!=': case '<>': return s != String(val);
+    case '>':  return parseFloat(v) > parseFloat(val);
+    case '<':  return parseFloat(v) < parseFloat(val);
+    case '>=': return parseFloat(v) >= parseFloat(val);
+    case '<=': return parseFloat(v) <= parseFloat(val);
+    case 'IS NULL': return v === null || v === undefined || v === '' || v === '—';
+    case 'IS NOT NULL': return v !== null && v !== undefined && v !== '' && v !== '—';
+    case 'LIKE': {
+      const pattern = '^' + String(val).replace(/%/g,'.*').replace(/_/g,'.') + '$';
+      return new RegExp(pattern,'i').test(s||'');
+    }
+    case 'IN': return val.includes(s) || val.map(String).includes(s);
+    default: return false;
+  }
+}
+
+// ── Apply GROUP BY + aggregates ────────────────────────
+function applyGroupBy(rows, groupCols, selectRaw) {
+  const groups = {};
+  for (const row of rows) {
+    const key = groupCols.map(c => {
+      const keys = Object.keys(row).filter(k=>k===c||k.endsWith('.'+c));
+      return keys.length ? row[keys[0]] : '';
+    }).join('|||');
+    if (!groups[key]) groups[key] = { rows:[], key };
+    groups[key].rows.push(row);
+  }
+
+  const cols = splitSelectCols(selectRaw);
+  return Object.values(groups).map(({rows:gr}) => {
+    const out = {};
+    // Group-by cols
+    for (const gc of groupCols) {
+      const keys = Object.keys(gr[0]).filter(k=>k===gc||k.endsWith('.'+gc));
+      out[gc] = keys.length ? gr[0][keys[0]] : null;
+    }
+    // Aggregate cols
+    for (const col of cols) {
+      const aggM = col.match(/^(COUNT|SUM|AVG|MIN|MAX)\s*\(\s*(\*|[\w.]+)\s*\)\s*(?:AS\s+(\w+))?$/i);
+      if (!aggM) continue;
+      const fn = aggM[1].toUpperCase();
+      const field = aggM[2] === '*' ? null : aggM[2].replace(/\w+\./,'');
+      const alias = aggM[3] || `${fn}(${aggM[2]})`;
+      const vals = gr.map(r => field ? (r[field]??0) : 1);
+      switch(fn) {
+        case 'COUNT': out[alias] = gr.length; break;
+        case 'SUM':   out[alias] = vals.reduce((a,b)=>a+parseFloat(b||0),0); break;
+        case 'AVG':   out[alias] = Math.round(vals.reduce((a,b)=>a+parseFloat(b||0),0)/vals.length*100)/100; break;
+        case 'MIN':   out[alias] = Math.min(...vals.map(parseFloat)); break;
+        case 'MAX':   out[alias] = Math.max(...vals.map(parseFloat)); break;
+      }
+    }
+    return out;
+  });
+}
+
+// ── Apply ORDER BY ────────────────────────────────────
+function applyOrderBy(rows, orderRaw) {
+  const parts = orderRaw.split(',').map(s=>s.trim());
+  return [...rows].sort((a,b) => {
+    for (const part of parts) {
+      const m = part.match(/^([\w.]+)\s*(ASC|DESC)?$/i);
+      if (!m) continue;
+      const col = m[1].replace(/\w+\./,'');
+      const dir = (m[2]||'ASC').toUpperCase() === 'DESC' ? -1 : 1;
+      const keysA = Object.keys(a).filter(k=>k===col||k.endsWith('.'+col));
+      const keysB = Object.keys(b).filter(k=>k===col||k.endsWith('.'+col));
+      const av = keysA.length ? a[keysA[0]] : null;
+      const bv = keysB.length ? b[keysB[0]] : null;
+      if (av===null && bv===null) continue;
+      if (av===null) return dir;
+      if (bv===null) return -dir;
+      const n = isNaN(av) || isNaN(bv);
+      const cmp = n ? String(av).localeCompare(String(bv)) : parseFloat(av)-parseFloat(bv);
+      if (cmp !== 0) return cmp * dir;
+    }
+    return 0;
+  });
+}
+
+// ── Render Results Table ──────────────────────────────
+function renderResults(rows) {
+  if (!rows || !rows.length) {
+    document.getElementById('sql-output').innerHTML =
+      '<div class="sql-empty">✅ Query ran successfully — 0 rows returned.</div>';
+    document.getElementById('sql-rows-badge').style.display='none';
+    return;
+  }
+  const cols = Object.keys(rows[0]);
+  const badge = document.getElementById('sql-rows-badge');
+  badge.textContent = `${rows.length} row${rows.length!==1?'s':''}`;
+  badge.style.display='inline-block';
+
+  const thead = `<thead><tr>${cols.map(c=>`<th>${escH(c)}</th>`).join('')}</tr></thead>`;
+  const tbody = `<tbody>${rows.map(row =>
+    `<tr>${cols.map(col => {
+      const v = row[col];
+      if (v === null || v === undefined) return `<td><span class="sql-null">NULL</span></td>`;
+      if (typeof v === 'number' || (!isNaN(v) && v !== '')) return `<td><span class="sql-num">${escH(v)}</span></td>`;
+      return `<td>${escH(v)}</td>`;
+    }).join('')}</tr>`
+  ).join('')}</tbody>`;
+
+  document.getElementById('sql-output').innerHTML =
+    `<div class="sql-result-wrap"><table class="sql-result-table">${thead}${tbody}</table></div>`;
+}
+
+function escH(v) {
+  return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Run Query ─────────────────────────────────────────
+function runQuery() {
+  const sql = document.getElementById('sql-input').value.trim();
+  const status = document.getElementById('sql-status');
+  const badge  = document.getElementById('sql-rows-badge');
+  if (!sql) return;
+
+  const t0 = performance.now();
+  try {
+    const rows = parseAndRun(sql);
+    const ms = (performance.now()-t0).toFixed(1);
+    renderResults(rows);
+    status.textContent = `✔ ${rows.length} row${rows.length!==1?'s':''} · ${ms}ms`;
+    status.className = 'sql-status ok';
+    document.getElementById('sql-exec-time').textContent = `Executed in ${ms}ms`;
+  } catch(e) {
+    document.getElementById('sql-output').innerHTML =
+      `<div class="sql-empty" style="color:var(--error)">❌ ${escH(e.message)}</div>`;
+    status.textContent = '❌ ' + e.message;
+    status.className = 'sql-status err';
+    badge.style.display='none';
+    document.getElementById('sql-exec-time').textContent='';
+  }
+}
+
+// ── Load snippet into editor ──────────────────────────
+function loadSnippet(el) {
+  // Get text content without the <small> tag
+  const clone = el.cloneNode(true);
+  clone.querySelectorAll('small').forEach(s=>s.remove());
+  document.getElementById('sql-input').value = clone.textContent.trim();
+  runQuery();
+}
+
+// ── Keyboard shortcut: Ctrl+Enter ─────────────────────
+function handleSqlKey(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); runQuery(); }
+  // Tab → insert spaces
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const t = e.target;
+    const s = t.selectionStart, en = t.selectionEnd;
+    t.value = t.value.substring(0,s) + '  ' + t.value.substring(en);
+    t.selectionStart = t.selectionEnd = s+2;
+  }
+}
+
+// ── Clear editor ──────────────────────────────────────
+function clearEditor() {
+  document.getElementById('sql-input').value='';
+  document.getElementById('sql-output').innerHTML='<div class="sql-empty">▶ Run a query to see results here</div>';
+  document.getElementById('sql-status').textContent='';
+  document.getElementById('sql-rows-badge').style.display='none';
+  document.getElementById('sql-exec-time').textContent='';
+}
+
+// ── Format query (basic prettifier) ──────────────────
+function formatQuery() {
+  const kws = ['SELECT','FROM','WHERE','JOIN','ON','GROUP BY','ORDER BY','LIMIT','AND','OR','AS','INNER','LEFT','HAVING'];
+  let q = document.getElementById('sql-input').value.trim();
+  for (const kw of kws) q = q.replace(new RegExp(`\\b${kw}\\b`,'gi'), kw);
+  q = q.replace(/,\s*/g, ',\n  ')
+       .replace(/\bFROM\b/g,'\nFROM')
+       .replace(/\bWHERE\b/g,'\nWHERE')
+       .replace(/\bJOIN\b/g,'\nJOIN')
+       .replace(/\bON\b(?!\s*\()/g,'\n  ON')
+       .replace(/\bGROUP BY\b/g,'\nGROUP BY')
+       .replace(/\bORDER BY\b/g,'\nORDER BY')
+       .replace(/\bLIMIT\b/g,'\nLIMIT')
+       .replace(/\bAND\b/g,'\n  AND')
+       .replace(/\bOR\b/g,'\n  OR');
+  document.getElementById('sql-input').value = q;
+}
+
+// ── Export CSV ────────────────────────────────────────
+function exportCSV() {
+  const sql = document.getElementById('sql-input').value.trim();
+  if (!sql) return;
+  try {
+    const rows = parseAndRun(sql);
+    if (!rows.length) return;
+    const cols = Object.keys(rows[0]);
+    const csv = [cols.join(','), ...rows.map(r =>
+      cols.map(c => {
+        const v = r[c] === null || r[c] === undefined ? '' : String(r[c]);
+        return v.includes(',') || v.includes('"') ? `"${v.replace(/"/g,'""')}"` : v;
+      }).join(',')
+    )].join('\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = 'spiceroute_query.csv';
+    a.click();
+  } catch(e) { alert('Run query first: ' + e.message); }
+}
+
+// ── Hook into renderPage ──────────────────────────────
+const _origRenderPage = renderPage;
+renderPage = function(page) {
+  _origRenderPage(page);
+  if (page === 'sqlpanel') {
+    // Auto-run the default query on first open
+    const inp = document.getElementById('sql-input');
+    if (inp && inp.value.trim()) runQuery();
+  }
+};
+</script>
+</body>
+</html>
